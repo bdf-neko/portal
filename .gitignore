@@ -1,0 +1,4 @@
+.DS_Store
+*.log
+FORK_REPORT.md
+SANITIZATION_REPORT.md
