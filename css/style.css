@@ -1,17 +1,7 @@
 @charset "UTF-8";
-/* =====================================================================
-   入口網站樣式表
-   結構：
-   1) 主題變數（明暗）
-   2) Reset 與基底
-   3) 排版工具（utility）
-   4) 元件
-   5) 響應式
-   ===================================================================== */
 
-/* ---------- 1) 主題變數 ---------- */
 :root {
-    /* 分類標題顏色（保留） */
+
     --color-1: #ff3333;
     --color-2: #e69900;
     --color-3: #33a033;
@@ -20,7 +10,6 @@
     --color-6: #e6005c;
     --color-7: #00b3e6;
 
-    /* 背景 */
     --bg-page: #ffffff;
     --bg-card: #ffffff;
     --bg-input: #ffffff;
@@ -30,7 +19,6 @@
     --bg-btn-hover: #d1d5db;
     --bg-overlay: rgba(75, 85, 99, 0.5);
 
-    /* 文字 */
     --text: #1f2937;
     --text-soft: #374151;
     --text-muted: #6b7280;
@@ -40,17 +28,14 @@
     --text-red: #dc2626;
     --text-red-soft: #ef4444;
 
-    /* 邊框 */
     --border-soft: #e5e7eb;
     --border: #d1d5db;
     --border-strong: #9ca3af;
 
-    /* 主題色 */
     --primary: #3b82f6;
     --primary-hover: #2563eb;
     --primary-ring: rgba(59, 130, 246, 0.4);
 
-    /* 文字大小 */
     --fs-xs: 0.75rem;
     --fs-sm: 0.875rem;
     --fs-base: 1rem;
@@ -58,33 +43,30 @@
     --fs-xl: 1.25rem;
     --fs-2xl: 1.5rem;
 
-    /* 圓角（2006 復古：幾乎方角，僅保留 1~2px） */
     --radius-sm: 1px;
     --radius: 3px;
     --radius-lg: 3px;
     --radius-full: 9999px;
 
-    /* 陰影 */
     --shadow-sm: 0 1px 2px 0 rgba(0,0,0,0.05);
     --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
     --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
 
-    /* 2006 金屬灰漸層（選單／搜尋列共用）：整體偏亮，上亮→中段大面積→下稍深 */
     --metal-top: #FBFCFD;
     --metal-mid: #EDF0F3;
     --metal-low: #E7EBEF;
     --metal-bot: #D9DEE4;
     --metal-edge: #BCC4CD;
     --metal-hi: rgba(255, 255, 255, 0.9);
-    /* 灰金屬按鈕 */
+
     --metal-btn-top: #FFFFFF;
     --metal-btn-bot: #E2E6EA;
     --metal-btn-bot-hover: #D2D7DD;
-    /* 復古面板（區塊）立體高光 */
+
     --panel-hi: rgba(255, 255, 255, 0.6);
-    /* 頁尾主題線（品牌綠） */
+
     --footer-rule: #78C800;
-    /* 月曆右下角折角 */
+
     --calendar-fold-top: #E8ECF0;
     --calendar-fold-bot: #D1D5DB;
     --calendar-fold-crease: rgba(0, 0, 0, 0.14);
@@ -121,7 +103,6 @@
     --border: #4b5563;
     --border-strong: #6b7280;
 
-    /* 暗色金屬灰漸層：上亮→中段大面積→下稍深 */
     --metal-top: #515A66;
     --metal-mid: #3D4450;
     --metal-low: #383F4A;
@@ -138,7 +119,6 @@
     --calendar-fold-crease: rgba(255, 255, 255, 0.12);
 }
 
-/* ---------- 2) Reset 與基底 ---------- */
 *, *::before, *::after { box-sizing: border-box; }
 
 html { -webkit-text-size-adjust: 100%; }
@@ -203,7 +183,6 @@ hr {
     border: 0;
 }
 
-/* ---------- 3) 排版工具（精簡 utility） ---------- */
 .container { max-width: 56rem; margin: 0 auto; }
 
 .hidden { display: none !important; }
@@ -245,9 +224,6 @@ hr {
 .text-faint { color: var(--text-faint); }
 .text-red { color: var(--text-red); }
 
-/* ---------- 4) 元件 ---------- */
-
-/* 4.1 卡片（2006 復古面板：方角 + 實線外框 + 頂部高光） */
 .card {
     background-color: var(--bg-card);
     border: 1px solid var(--border);
@@ -256,11 +232,10 @@ hr {
     padding: 1rem;
 }
 .card--sm { padding: 0.5rem; }
-/* 搜尋整條：2006 選單式灰金屬橫帶（只留上下邊框、左右不收邊）
-   漸層：最上亮、中段大面積中間色、最下偏深一點點 */
+
 .card--md {
     padding: 0.85rem 0.75rem;
-    /* 漸層由上方亮色帶到大面積中間色即收住，不再轉深（與下方熱門區接續） */
+
     background: linear-gradient(180deg,
         var(--metal-top) 0%,
         var(--metal-mid) 10%,
@@ -269,12 +244,10 @@ hr {
     border-left: 0;
     border-right: 0;
     border-radius: 0;
-    /* 只保留頂部亮線；底邊交給下方接續區塊收尾 */
     box-shadow: inset 0 1px 0 var(--metal-hi);
+    margin-bottom: 1rem;
 }
 
-/* 4.2 按鈕 */
-/* 2006 風按鈕：漸層 + 邊框 + 頂部高光 + 壓按效果 */
 .btn {
     display: inline-flex;
     align-items: center;
@@ -319,7 +292,6 @@ hr {
     text-decoration: none;
 }
 
-/* 圓形圖示按鈕 */
 .icon-btn {
     display: inline-flex;
     align-items: center;
@@ -341,7 +313,6 @@ hr {
 .icon-btn:active { box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.20); }
 .icon-btn svg { width: 1.25rem; height: 1.25rem; }
 
-/* 4.3 表單 */
 .input, .select {
     width: 100%;
     padding: 0.5rem 0.75rem;
@@ -365,7 +336,6 @@ hr {
     color: var(--text-soft);
 }
 
-/* 4.4 切換開關 */
 .switch {
     position: relative;
     display: inline-block;
@@ -398,7 +368,6 @@ hr {
     box-shadow: 0 0 0 4px var(--primary-ring);
 }
 
-/* 4.5 分節分段選擇器（明亮 / 灰暗 / 自動） */
 .segmented {
     display: flex;
     align-items: center;
@@ -432,7 +401,6 @@ hr {
     background-color: var(--border);
 }
 
-/* 4.6 彈窗 */
 .modal {
     position: fixed; inset: 0;
     background-color: var(--bg-overlay);
@@ -470,7 +438,6 @@ hr {
     gap: 0.75rem;
 }
 
-/* 4.7 下拉選單 */
 .dropdown { position: relative; display: inline-block; }
 .dropdown__bridge {
     position: absolute;
@@ -522,7 +489,6 @@ hr {
     pointer-events: auto;
 }
 
-/* 4.8 分類列（社群、影視、繪畫⋯⋯） */
 .cat-row {
     display: flex;
     flex-wrap: wrap;
@@ -599,19 +565,17 @@ hr {
     color: var(--border-soft);
 }
 
-/* 4.9 搜尋區（搜尋整條已是灰金屬橫帶，此處僅排列白底輸入框 + 灰金屬按鈕） */
 .search-bar {
     position: relative;
     display: flex;
-    align-items: stretch; /* 輸入框與按鈕同高 */
+    align-items: stretch;
     width: 22rem;
     max-width: 100%;
     gap: 4px;
     background: transparent;
     border: 0;
 }
-/* 輸入框左側的放大鏡圖示（位於輸入框外）
-   採絕對定位，使其維持原尺寸又不會撐高右側輸入框 */
+
 .search-bar__icon {
     position: absolute;
     left: 0;
@@ -623,7 +587,7 @@ hr {
     image-rendering: auto;
     pointer-events: none;
 }
-/* 輸入框 + 建議下拉的包裝：建議清單與輸入框等寬，並預留左側圖示空間 */
+
 .search-bar__field {
     position: relative;
     display: flex;
@@ -635,7 +599,7 @@ hr {
     flex: 1;
     width: 100%;
     min-width: 0;
-    padding: 0.25rem 0.6rem; /* 略增高度，讓整體區塊高一點點 */
+    padding: 0.25rem 0.6rem;
     background-color: var(--bg-input);
     color: var(--text);
     border: 1px solid var(--border);
@@ -644,7 +608,7 @@ hr {
     transition: border-color 0.2s;
 }
 .search-bar__input:focus { border-color: var(--primary); }
-/* 搜尋按鈕：橘黃果凍漸層 + 「搜尋」文字 */
+
 .search-bar__btn {
     flex-shrink: 0;
     display: inline-flex;
@@ -670,7 +634,7 @@ hr {
 .search-bar__btn:active { box-shadow: inset 0 1px 3px rgba(120, 60, 0, 0.30); }
 .search-bar__btn-label { font-size: var(--fs-sm); line-height: 1; }
 .search-bar__btn svg { width: 1rem; height: 1rem; }
-/* 深色模式：輸入框明顯凹陷的深底，按鈕轉為較沉穩的金黃（仍深字） */
+
 .dark .search-bar__input {
     background-color: #1B212A;
     border-color: #11151B;
@@ -688,7 +652,7 @@ hr {
     .search-bar { width: 100%; }
     .search-bar__input { padding-top: 0.5rem; padding-bottom: 0.5rem; }
 }
-/* 搜尋建議下拉（包在 .search-bar__field 內，自然與輸入框等寬） */
+
 .search-suggest {
     position: absolute;
     top: calc(100% + 0.25rem);
@@ -709,7 +673,7 @@ hr {
     text-align: left;
     padding: 0.4rem 0.6rem;
     font-size: var(--fs-sm);
-    color: var(--text-soft); /* 預設淡色：建議補完部分 */
+    color: var(--text-soft);
     background-color: transparent;
     border: none;
     border-radius: var(--radius-sm);
@@ -724,14 +688,10 @@ hr {
 }
 .search-suggest__item mark {
     background-color: transparent;
-    color: var(--text); /* 已輸入部分以主色加粗 */
+    color: var(--text);
     font-weight: 600;
 }
 
-/* 熱門搜尋（搜尋框下方常駐橫排，以頓號分隔；資料來源標於頁尾） */
-/* 熱門搜尋：接續搜尋 bar 下方的獨立橫帶
-   底色比上方大面積(metal-low)淺一階、純色不漸層；
-   底部內側以亮色-2 + 金屬亮線收尾（呼應上方漸層頂線） */
 .search-trending {
     padding: 0.4rem 0.75rem;
     background: var(--metal-mid);
@@ -770,7 +730,7 @@ hr {
     color: var(--text-muted);
     margin: 0 0.3rem;
 }
-/* 熱門搜尋載入骨架：沿用列表的 shimmer */
+
 .search-trending__skeleton {
     display: inline-block;
     vertical-align: middle;
@@ -819,7 +779,6 @@ hr {
 }
 .feature-link:hover { color: var(--text-red); }
 
-/* 4.10 主要佈局 */
 .layout {
     display: grid;
     grid-template-columns: 1fr;
@@ -829,17 +788,15 @@ hr {
     .layout {
         grid-template-columns: 2fr 1fr;
     }
-    .layout__sticky {
-        position: sticky;
-        top: 1rem;
-        align-self: start;
+    .layout__side {
+        display: flex;
+        flex-direction: column;
+        align-self: stretch;
     }
 }
 
-/* grid 子項目允許子內容收縮（避免長文字撐開卡片寬度，例如跑馬燈） */
 .layout__main, .layout__side { min-width: 0; }
 
-/* 行動裝置：日曆/天氣放上面 */
 .layout__main { order: 2; }
 .layout__side { order: 1; }
 @media (min-width: 768px) {
@@ -847,7 +804,6 @@ hr {
     .layout__side { order: 2; }
 }
 
-/* 4.11 頂部導覽（自訂連結） */
 .nav-container {
     display: flex;
     flex-direction: column;
@@ -872,47 +828,22 @@ hr {
     display: grid;
     gap: 0.25rem;
     min-height: 60px;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, minmax(0, 1fr));
 }
-@media (min-width: 769px) {
+@media (min-width: 768px) {
     #custom-links {
-        grid-template-columns: repeat(4, 1fr) auto repeat(4, 1fr);
-        gap: 0.5rem;
+        grid-template-columns: repeat(10, minmax(0, 1fr));
+        gap: 0.25rem;
         grid-auto-rows: minmax(60px, auto);
-    }
-    .logo-placeholder {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        min-width: 60px;
-        grid-column: 5;
-        grid-row: 1;
-        pointer-events: none;
-    }
-    #custom-links.sortable-dragging {
-        grid-template-columns: repeat(4, 1fr) auto repeat(4, 1fr);
     }
     #custom-links .sortable-ghost {
         opacity: 0.4;
-        grid-column: span 1;
-    }
-}
-@media (max-width: 768px) {
-    .logo-placeholder {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        grid-column: 1 / -1;
-        grid-row: 1;
-        pointer-events: none;
-        margin-bottom: 0.5rem;
     }
 }
 @media (max-width: 480px) {
     #custom-links { gap: 0.25rem; }
 }
 
-/* Logo 圖片大小（取代原本的 tailwind classes） */
 .logo-img {
     width: 50%;
     height: auto;
@@ -921,13 +852,13 @@ hr {
 @media (min-width: 640px) { .logo-img { width: 40%; } }
 @media (min-width: 768px) { .logo-img { width: 12rem; } }
 
-/* 連結卡片（每一個頂部連結） */
 .nav-card {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     height: 5rem;
+    min-width: 0;
     border-radius: var(--radius);
     position: relative;
 }
@@ -935,7 +866,7 @@ hr {
     background-color: var(--bg-tag-hover);
     cursor: move;
 }
-/* 編輯態抑制原本的 hover 動效，避免拖曳時干擾 */
+
 .nav-card--edit:hover .nav-card__nav-icon,
 .nav-card--edit:hover .nav-card__favicon-box {
     transform: none;
@@ -1034,14 +965,12 @@ hr {
 }
 .nav-card:hover .nav-card__label { color: var(--text-red); }
 
-/* 頂部導覽連結 hover 紅色底線 */
 #custom-links a:hover {
     text-decoration: underline;
     text-underline-offset: 2px;
     text-decoration-color: var(--text-red) !important;
 }
 
-/* 4.12 服務（祈願版、日記本等） */
 .services {
     display: flex;
     justify-content: space-between;
@@ -1068,7 +997,7 @@ hr {
     height: 2.5rem;
     margin-bottom: 0.25rem;
 }
-/* 浮在 icon 上方，不佔版面、不把 icon 往下推 */
+
 .service__new {
     position: absolute;
     top: 0;
@@ -1092,7 +1021,7 @@ hr {
     border: 0;
     border-top: 1px dotted var(--border);
 }
-/* 下方兩項：與上方四個相同—左右各半、置中、中間直線分隔 */
+
 .services-extra {
     display: flex;
     justify-content: space-between;
@@ -1132,13 +1061,11 @@ hr {
     align-self: center;
 }
 
-/* 4.13 天氣 */
-/* 有標題列的卡片：圓角放大到 4px，讓外框跟著標題列的小圓角一起彎 */
 #weather-container,
 #horoscope-container {
     border-radius: 6px 6px var(--radius) var(--radius);
 }
-/* 標題列：2006 灰金屬視窗標題列（與選單／搜尋同色系） */
+
 .weather-head {
     display: flex;
     justify-content: space-between;
@@ -1213,7 +1140,7 @@ hr {
     align-items: center;
     padding: 1rem 0;
 }
-/* 天氣載入骨架（與新聞 skeleton 同一套 shimmer，保留三欄版位） */
+
 .weather-day--skeleton {
     gap: 0.5rem;
     padding-top: 0.35rem;
@@ -1235,7 +1162,6 @@ hr {
 .weather-skeleton-bar--temp { width: 82%; height: 0.85rem; }
 .weather-skeleton-bar--rain { width: 46%; height: 0.7rem; }
 
-/* 通用 skeleton shimmer（行事曆、星座共用，與天氣/新聞同一套動畫） */
 .skeleton-bar,
 .cal-skeleton-cell {
     display: block;
@@ -1250,7 +1176,6 @@ hr {
     animation: news-skeleton-shimmer 1.4s ease-in-out infinite;
 }
 
-/* 行事曆載入骨架（沿用 .calendar 版位，建立後由 JS 取代） */
 .skeleton-bar--cal-date  { width: 72%; height: 2.2rem; }
 .skeleton-bar--cal-day   { width: 90%; height: 0.85rem; }
 .skeleton-bar--cal-lunar { width: 55%; height: 0.7rem; }
@@ -1260,7 +1185,6 @@ hr {
     border-radius: var(--radius-full);
 }
 
-/* 星座運勢載入骨架 */
 .horoscope-skeleton { display: none; }
 #horoscope-container.is-loading .horoscope-skeleton {
     display: flex;
@@ -1436,7 +1360,6 @@ hr {
 .calendar__cell--out { color: var(--text-faint); }
 .calendar__cell--selected { background-color: var(--bg-tag); }
 
-/* 4.15 設定面板 */
 .settings-panel {
     position: fixed;
     bottom: 4rem;
@@ -1461,7 +1384,6 @@ hr {
     z-index: 19;
 }
 
-/* 4.16 頁尾（比照星座／哈啦：主題線 ── 連結群 ── 短線 + 置中版權） */
 .footer { padding: 16px 0 18px; }
 .footer__inner {
     padding: 0;
@@ -1541,7 +1463,6 @@ hr {
     color: var(--text-link-hover);
 }
 
-/* 4.17 新聞區塊（跑馬燈或分頁式條列） */
 .news-card {
     background-color: var(--bg-card);
     border: 1px solid var(--border);
@@ -1549,7 +1470,7 @@ hr {
     box-shadow: inset 0 1px 0 var(--panel-hi), 0 1px 0 rgba(0, 0, 0, 0.03);
     overflow: hidden;
 }
-/* 條列模式：news-card 自己不是卡片，由內部 list-body 當卡片，tabs 凸出在外 */
+
 .news-card.news-card--list {
     background-color: transparent;
     border: 0;
@@ -1626,7 +1547,6 @@ hr {
 .news-title--muted { color: var(--text-muted); }
 .news-title--error { color: var(--text-red); }
 
-/* 條列式新聞（tabs 真正凸出在卡片外，list-body 才是卡片） */
 .news-list-wrap {
     display: flex;
     flex-direction: column;
@@ -1638,7 +1558,7 @@ hr {
     padding: 0;
     background-color: transparent;
 }
-/* 左右淡出遮罩：當 list 可向左/向右滑動時，由 JS 切換 fade-left/fade-right class */
+
 .news-tabs::before,
 .news-tabs::after {
     content: '';
@@ -1671,11 +1591,11 @@ hr {
     overflow-x: auto;
     overflow-y: hidden;
     scroll-behavior: smooth;
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE/Edge */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 }
 .news-tabs__list::-webkit-scrollbar { display: none; }
-/* 桌機：tabs 平均分配寬度撐滿，不需橫向滾動 */
+
 @media (min-width: 768px) {
     .news-tabs__list {
         overflow: visible;
@@ -1689,8 +1609,8 @@ hr {
 .news-tab {
     appearance: none;
     flex-shrink: 0;
-    margin-bottom: -1px; /* 重疊到 list-body 上緣，讓 active 與 body 連通 */
-    /* 所有分頁等高（避免點擊時版面彈動）；非 active 用 transform 視覺上壓低一點，不影響排版 */
+    margin-bottom: -1px;
+
     padding: 0.5rem 0.85rem;
     transform: translateY(2px);
     font-size: var(--fs-sm);
@@ -1710,7 +1630,7 @@ hr {
     color: var(--text);
     background: linear-gradient(180deg, var(--metal-top) 0%, var(--metal-low) 100%);
 }
-/* active：反白（白字）＋ 底色為該分類主題色 ＋ 果凍高光 ＋ 抬高貼齊內容 */
+
 .news-tab.is-active {
     transform: translateY(0);
     color: #fff;
@@ -1727,7 +1647,7 @@ hr {
     font-weight: 700;
     cursor: default;
 }
-/* 深色模式：減少白色高光、加深下緣，讓分類主題色更飽和 */
+
 .dark .news-tab.is-active {
     background:
         linear-gradient(180deg,
@@ -1742,12 +1662,12 @@ hr {
     position: relative;
     background-color: var(--bg-card);
     border: 1px solid var(--border);
-    /* 上邊永遠為直線：頭尾 tab 接管整個容器的左上 / 右上圓角，避免縫隙 */
+
     border-radius: 0 0 var(--radius-lg) var(--radius-lg);
     box-shadow: inset 0 1px 0 var(--panel-hi), 0 1px 0 rgba(0, 0, 0, 0.03);
     padding: 1rem;
 }
-/* 桌機：左圖右列表佈局 */
+
 @media (min-width: 768px) {
     .news-list-body {
         display: grid;
@@ -1755,13 +1675,13 @@ hr {
         gap: 1rem;
         align-items: start;
     }
-    /* 暫時：無左側預覽時改為單欄列表 */
+
     .news-list-body--no-preview {
         grid-template-columns: 1fr;
     }
 }
 .news-preview {
-    display: none; /* 手機隱藏，桌機 grid 才出現 */
+    display: none;
     text-decoration: none;
     color: inherit;
 }
@@ -1795,20 +1715,20 @@ hr {
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
-    min-height: 2.2rem; /* 預留 2 行高度避免抖動 */
+    min-height: 2.2rem;
 }
 .news-preview--empty {
     cursor: default;
     pointer-events: none;
 }
 .news-preview--empty .news-preview__caption {
-    color: transparent; /* 沒圖時不顯示 caption */
+    color: transparent;
 }
-/* 對應預覽中的條列項目：以底色高亮提示 */
+
 .news-list-item--previewed .news-list-link {
     background-color: var(--bg-tag);
 }
-/* 頭尾 tab 接管整個分頁容器的外側圓角，與 list-body 下方圓角呼應 */
+
 .news-tabs__list .news-tab:first-child {
     border-top-left-radius: var(--radius-lg);
 }
@@ -1819,7 +1739,7 @@ hr {
     list-style: none;
     padding: 0;
     margin: 0;
-    min-width: 0; /* grid 子元素允許收縮，標題才能正確 ellipsis */
+    min-width: 0;
 }
 .news-list-item {
     margin: 0;
@@ -1837,7 +1757,7 @@ hr {
     text-decoration: none;
     border-radius: var(--radius-sm);
     transition: background-color 0.15s, color 0.15s;
-    min-width: 0; /* flex 容器允許子 span 被壓縮，ellipsis 才會生效 */
+    min-width: 0;
 }
 .news-list-link::before {
     content: '';
@@ -1869,13 +1789,12 @@ hr {
     text-align: center;
 }
 
-/* 條列式 skeleton（載入中保留空間） */
 .news-list--skeleton .news-list-item {
     margin: 0;
-    padding: 0.5rem 0.6rem; /* 對應 .news-list-link 的 padding，保證 skeleton 與真實列表等高 */
+    padding: 0.5rem 0.6rem;
 }
 .news-list-skeleton-bar {
-    height: 1.13rem; /* fs-sm × line-height 1.3，對應一行文字高 */
+    height: 1.13rem;
     border-radius: var(--radius-sm);
     background: linear-gradient(
         90deg,
@@ -1893,7 +1812,7 @@ hr {
     0%   { background-position: 200% 0; }
     100% { background-position: -200% 0; }
 }
-/* 分頁（tabs）載入骨架：沿用列表的 shimmer */
+
 .news-tab--skeleton {
     width: 4.5rem;
     cursor: default;
@@ -1914,7 +1833,6 @@ hr {
     animation: news-skeleton-shimmer 1.4s ease-in-out infinite;
 }
 
-/* 分類底色 */
 .bg-news-politics { background-color: #ef4444; }
 .bg-news-world    { background-color: #3b82f6; }
 .bg-news-cross    { background-color: #f97316; }
@@ -1928,13 +1846,8 @@ hr {
 .bg-news-ent      { background-color: #f43f5e; }
 .bg-news-default  { background-color: #6b7280; }
 
-/* ========================================================================
-   星座運勢
-   ======================================================================== */
-
-/* --- 首頁精簡卡 --- */
 #horoscope-container { padding: 1rem; }
-/* 標題列：2006 灰金屬視窗標題列 */
+
 .horoscope-head {
     display: flex;
     justify-content: space-between;
@@ -2001,7 +1914,7 @@ hr {
     color: var(--text-soft);
     line-height: 1.65;
     word-break: break-word;
-    /* 內文最多兩行，超出以「…」省略 */
+
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
@@ -2053,36 +1966,12 @@ hr {
     color: var(--text-link);
 }
 
-/* ---------- 5) 響應式輔助 ---------- */
 .md-only { display: none; }
 @media (min-width: 768px) {
     .md-only { display: initial; }
     .mobile-only { display: none !important; }
 }
 
-/* 站名文字標誌（未提供自訂圖檔時） */
-.logo-link {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    pointer-events: auto;
-    text-decoration: none;
-}
-.logo-link:hover { text-decoration: none; }
-.logo-placeholder { pointer-events: auto; }
-.logo-wordmark {
-    font-size: 1.65rem;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    color: var(--primary);
-    line-height: 1.2;
-}
-@media (min-width: 768px) {
-    .logo-wordmark { font-size: 1.85rem; }
-}
-
-/* 上方捷徑只留網站圖示，不再疊品牌插圖 */
 .nav-card__favicon-box--solo {
     position: relative;
     bottom: auto;
@@ -2106,10 +1995,36 @@ hr {
 .search-row--center { grid-template-columns: minmax(0, 36rem); justify-content: center; }
 .search-bar__icon { color: var(--text-muted); }
 
-/* 工具列只有標題，不要留下天氣預報用的空白 */
-#tools-container { padding: 0; }
-#tools-container .weather-head {
-    margin: 0;
-    border-bottom: 0;
-    border-radius: var(--radius-lg);
+.side-tools {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1rem;
+    flex: 1;
 }
+.tool-block {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    padding: 0;
+    overflow: hidden;
+}
+.tool-block .weather-head {
+    margin: 0;
+    flex-shrink: 0;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+.tool-block__links {
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    gap: 0.35rem 0.85rem;
+    padding: 0.75rem 0.85rem 0.85rem;
+}
+.tool-block__link {
+    font-size: var(--fs-sm);
+    color: var(--text-link);
+    line-height: 1.5;
+}
+.tool-block__link:hover { color: var(--text-link-hover); }

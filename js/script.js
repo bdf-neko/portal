@@ -1,11 +1,7 @@
-// 行事曆假日資料
-let getHolidays;
-
-const loadModules = import(`./holidays.js?v=${window.moduleVersions.holidays}`).then(m => {
-    getHolidays = m.getHolidays;
-});
-
-const defaultLinks = Array.isArray(window.defaultLinks) ? window.defaultLinks.map(link => ({ ...link })) : [];
+const portal = window.portalConfig || {};
+const defaultLinks = Array.isArray(portal.nav_links)
+    ? portal.nav_links.map(link => ({ name: link.name, url: link.url, iconUrl: link.iconUrl || '' }))
+    : [];
 
 const defaultSettings = {
     darkMode: 'default',
@@ -17,9 +13,6 @@ let links = defaultLinks.map(link => ({ ...link }));
 let editMode = false;
 let editingIndex = -1;
 let { darkMode, openInNewTab, searchEngine } = defaultSettings;
-
-let currentYear = new Date().getFullYear();
-let holidays = {};
 
 let displayedMonth = new Date().getMonth();
 let displayedYear = new Date().getFullYear();
@@ -51,28 +44,105 @@ function escHtml(value) {
     }[c]));
 }
 
-function buildLogo() {
-    const el = document.createElement('div');
-    el.className = 'logo-placeholder';
-    const anchor = document.createElement('a');
-    anchor.href = window.logoLink || '#';
-    anchor.id = 'logo-link';
-    anchor.className = 'logo-link';
-    const siteName = window.siteName || '入口';
-    if (window.logoPath) {
-        const img = document.createElement('img');
-        img.src = window.logoPath;
-        img.alt = siteName;
-        img.className = 'logo-img';
-        anchor.appendChild(img);
-    } else {
-        const word = document.createElement('span');
-        word.className = 'logo-wordmark';
-        word.textContent = siteName;
-        anchor.appendChild(word);
+function loadJsonp(url) {
+    return new Promise((resolve, reject) => {
+        const callbackName = 'portalSuggest' + Date.now() + Math.floor(Math.random() * 100000);
+        const script = document.createElement('script');
+        let settled = false;
+        const finish = (error, data) => {
+            if (settled) return;
+            settled = true;
+            clearTimeout(timer);
+            script.remove();
+            try { delete window[callbackName]; } catch (e) { window[callbackName] = undefined; }
+            if (error) reject(error);
+            else resolve(data);
+        };
+        const timer = setTimeout(() => finish(new Error('timeout')), 3500);
+        window[callbackName] = (data) => finish(null, data);
+        script.onerror = () => finish(new Error('jsonp'));
+        script.src = url + (url.includes('?') ? '&' : '?') + 'callback=' + encodeURIComponent(callbackName);
+        document.head.appendChild(script);
+    });
+}
+
+function fillFeature(id, slot) {
+    const cell = document.getElementById(id);
+    if (!cell) return false;
+    const text = String((slot && slot.text) || '').trim();
+    const url = String((slot && slot.url) || '').trim();
+    if (!text || !url) {
+        cell.classList.add('hidden');
+        cell.innerHTML = '';
+        return false;
     }
-    el.appendChild(anchor);
-    return el;
+    cell.classList.remove('hidden');
+    cell.innerHTML = `<a class="feature-link" href="${escHtml(url)}">${escHtml(text)}</a>`;
+    return true;
+}
+
+function renderCategoryCard(element, groups) {
+    if (!element) return;
+    const list = Array.isArray(groups) ? groups : [];
+    element.innerHTML = list.map((group, index) => {
+        const title = group[0] || '';
+        const colored = group.length >= 3;
+        const items = colored ? (group[2] || []) : (group[1] || []);
+        const titleClass = colored ? 'cat-title cat-title--color' : 'cat-title';
+        const style = colored ? ` style="--cat-color: ${escHtml(group[1])}"` : '';
+        const linksHtml = items.map(link => {
+            if (Array.isArray(link) && link.length === 1 && link[0] === '|') {
+                return '<span class="cat-divider">｜</span>';
+            }
+            return `<a class="cat-link" href="${escHtml(link[1] || '#')}">${escHtml(link[0] || '')}</a>`;
+        }).join('');
+        const rule = index > 0 ? '<hr>' : '';
+        return `${rule}<div class="cat-row"><h3 class="${titleClass}"${style}>${escHtml(title)}</h3><div class="cat-row__links">${linksHtml}</div></div>`;
+    }).join('');
+}
+
+function renderDirectory() {
+    const name = portal.site_name || '入口';
+    const tagline = portal.tagline || '';
+    const description = portal.description || tagline;
+    document.title = tagline ? `${name} - ${tagline}` : name;
+    const desc = document.querySelector('meta[name="description"]');
+    if (desc) desc.setAttribute('content', description);
+    const ogTitle = document.querySelector('meta[property="og:title"]');
+    if (ogTitle) ogTitle.setAttribute('content', document.title);
+    const ogDesc = document.querySelector('meta[property="og:description"]');
+    if (ogDesc) ogDesc.setAttribute('content', description);
+    const footerName = document.getElementById('footer-name');
+    if (footerName) footerName.textContent = name;
+    const footerYear = document.getElementById('footer-year');
+    if (footerYear) footerYear.textContent = String(new Date().getFullYear());
+
+    renderCategoryCard(document.getElementById('category-primary'), portal.categories_primary);
+    renderCategoryCard(document.getElementById('category-secondary'), portal.categories_secondary);
+
+    const tools = document.getElementById('side-tools');
+    if (tools) {
+        const list = Array.isArray(portal.tools) ? portal.tools : [];
+        tools.innerHTML = list.map(tool => {
+            const linksHtml = (tool[1] || []).map(link =>
+                `<a class="tool-block__link" href="${escHtml(link[1] || '#')}">${escHtml(link[0] || '')}</a>`
+            ).join('');
+            return `<section class="card tool-block"><div class="weather-head"><h3 class="weather-title">${escHtml(tool[0] || '')}</h3></div><div class="tool-block__links">${linksHtml}</div></section>`;
+        }).join('');
+    }
+
+    const features = portal.feature_links || {};
+    const leftOn = fillFeature('feature-left', features.left);
+    const rightOn = fillFeature('feature-right', features.right);
+    const row = document.getElementById('search-row');
+    if (row) row.classList.toggle('search-row--center', !(leftOn || rightOn));
+    const mobile = document.getElementById('search-mobile-links');
+    if (mobile) {
+        mobile.innerHTML = '';
+        if (leftOn) mobile.appendChild(document.getElementById('feature-left').firstChild.cloneNode(true));
+        if (rightOn) mobile.appendChild(document.getElementById('feature-right').firstChild.cloneNode(true));
+        mobile.classList.toggle('hidden', !(leftOn || rightOn));
+    }
 }
 
 function isLocalStorageAvailable() {
@@ -91,14 +161,20 @@ function loadSettings() {
         try {
             links = JSON.parse(localStorage.getItem('customLinks')) || defaultLinks.map(link => ({ ...link }));
 
-            let linksUpdated = false;
-            links.forEach(link => {
-                if (link.url === 'https://plurk.com') {
-                    link.url = 'https://www.plurk.com';
-                    linksUpdated = true;
-                }
-            });
-            if (linksUpdated) {
+            const previousDefaults = [
+                'https://mail.google.com',
+                'https://beta.mosir.app/',
+                'https://facebook.com',
+                'https://instagram.com',
+                'https://threads.net',
+                'https://bsky.app',
+                'https://youtube.com',
+                'https://twitch.tv'
+            ];
+            const stillPreviousDefaults = links.length === previousDefaults.length
+                && links.every((link, index) => link.url === previousDefaults[index]);
+            if (stillPreviousDefaults) {
+                links = defaultLinks.map(link => ({ ...link }));
                 localStorage.setItem('customLinks', JSON.stringify(links));
             }
 
@@ -158,21 +234,18 @@ function saveSettings() {
     renderLinks();
 }
 
-// 修改 applyDarkMode 函數
 const applyDarkMode = () => {
     const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const shouldApplyDark = 
-        darkMode === 'dark' || 
+    const shouldApplyDark =
+        darkMode === 'dark' ||
         (darkMode === 'auto' && prefersDarkScheme);
 
     document.documentElement.classList.toggle('dark', shouldApplyDark);
-    
-    // 更新 theme-color
+
     const themeColorMeta = document.getElementById('themeColorMeta');
     themeColorMeta.content = shouldApplyDark ? '#1F2937' : '#ffffff';
 };
 
-// 修改 changeDarkMode 函數
 function changeDarkMode(e) {
     darkMode = e.target.value;
     applyDarkMode();
@@ -180,11 +253,10 @@ function changeDarkMode(e) {
     saveSettings();
 }
 
-// 添加新的函數來更新深色模式 UI
 function updateDarkModeUI() {
     const options = ['default', 'dark', 'auto'];
     const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
+
     options.forEach(option => {
         const input = document.getElementById(`darkMode${option.charAt(0).toUpperCase() + option.slice(1)}`);
         input.checked = darkMode === option;
@@ -194,7 +266,6 @@ function updateDarkModeUI() {
 let linkIconCache = {};
 let linksModified = false;
 
-// 特定網站的圖示映射
 const customIcons = {
     'mail.google.com': 'https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico',
     'gmail.com': 'https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico',
@@ -211,21 +282,20 @@ const customIcons = {
 
 function getFaviconUrl(url, customIconUrl = null) {
     return new Promise((resolve) => {
-        // 如果有自訂圖示網址，直接使用
+
         if (customIconUrl && customIconUrl.trim()) {
             const img = new Image();
             img.onload = () => {
                 resolve(customIconUrl);
             };
             img.onerror = () => {
-                // 如果自訂圖示載入失敗，回退到預設邏輯
+
                 getFaviconUrlFromDomain(url).then(resolve);
             };
             img.src = customIconUrl;
             return;
         }
-        
-        // 沒有自訂圖示時，使用原本的邏輯
+
         getFaviconUrlFromDomain(url).then(resolve);
     });
 }
@@ -233,33 +303,29 @@ function getFaviconUrl(url, customIconUrl = null) {
 function getFaviconUrlFromDomain(url) {
     return new Promise((resolve) => {
         const domain = new URL(url).hostname;
-        
-        // 檢查記憶體緩存
+
         if (linkIconCache[domain]) {
             resolve(linkIconCache[domain]);
             return;
         }
-        
-        // 檢查本地儲存緩存
+
         const cachedIcons = JSON.parse(localStorage.getItem(ICON_CACHE_KEY) || '{}');
         const cachedIcon = cachedIcons[domain];
-        
-        // 檢查緩存版本，如果版本不匹配則清除緩存
+
         if (cachedIcons._version !== ICON_CACHE_VERSION) {
             localStorage.removeItem(ICON_CACHE_KEY);
-            // 重新獲取空的緩存物件
+
             const emptyCachedIcons = {};
             emptyCachedIcons._version = ICON_CACHE_VERSION;
             localStorage.setItem(ICON_CACHE_KEY, JSON.stringify(emptyCachedIcons));
         }
-        
+
         if (cachedIcon && cachedIcon.timestamp > Date.now() - ICON_CACHE_DURATION) {
             linkIconCache[domain] = cachedIcon.url;
             resolve(cachedIcon.url);
             return;
         }
 
-        // 檢查是否有自定義圖示
         if (customIcons[domain]) {
             const customIconUrl = customIcons[domain];
             const img = new Image();
@@ -274,14 +340,13 @@ function getFaviconUrlFromDomain(url) {
                 resolve(customIconUrl);
             };
             img.onerror = () => {
-                // 如果自定義圖示失敗，嘗試其他方法
+
                 tryMultipleFaviconSources(domain, cachedIcons, resolve);
             };
             img.src = customIconUrl;
             return;
         }
 
-        // 如果沒有自定義圖示，嘗試多種 favicon 來源
         tryMultipleFaviconSources(domain, cachedIcons, resolve);
     });
 }
@@ -298,7 +363,7 @@ function tryMultipleFaviconSources(domain, cachedIcons, resolve) {
 
     function tryNextSource() {
         if (currentIndex >= faviconSources.length) {
-            // 所有來源都失敗，使用預設圖示
+
             const defaultIconUrl = DEFAULT_ICON;
             linkIconCache[domain] = defaultIconUrl;
             cachedIcons[domain] = {
@@ -313,7 +378,7 @@ function tryMultipleFaviconSources(domain, cachedIcons, resolve) {
 
         const faviconUrl = faviconSources[currentIndex];
         const img = new Image();
-        
+
         img.onload = () => {
             linkIconCache[domain] = faviconUrl;
             cachedIcons[domain] = {
@@ -324,12 +389,12 @@ function tryMultipleFaviconSources(domain, cachedIcons, resolve) {
             localStorage.setItem(ICON_CACHE_KEY, JSON.stringify(cachedIcons));
             resolve(faviconUrl);
         };
-        
+
         img.onerror = () => {
             currentIndex++;
             tryNextSource();
         };
-        
+
         img.src = faviconUrl;
     }
 
@@ -369,40 +434,14 @@ async function renderLinks() {
     customLinksContainer.innerHTML = '';
 
     const defaultIconUrl = DEFAULT_ICON;
-    const isMobile = window.innerWidth <= 768;
 
-    const buildLogoPlaceholder = () => buildLogo();
-
-    if (isMobile) {
-        customLinksContainer.appendChild(buildLogoPlaceholder());
-        for (let i = 0; i < links.length; i++) {
-            customLinksContainer.appendChild(createLinkElement(links[i], i, defaultIconUrl));
-        }
-    } else {
-        for (let i = 0; i < 4 && links[i]; i++) {
-            customLinksContainer.appendChild(createLinkElement(links[i], i, defaultIconUrl));
-        }
-        customLinksContainer.appendChild(buildLogoPlaceholder());
-        for (let i = 4; i < links.length; i++) {
-            customLinksContainer.appendChild(createLinkElement(links[i], i, defaultIconUrl));
-        }
+    for (let i = 0; i < links.length; i++) {
+        customLinksContainer.appendChild(createLinkElement(links[i], i, defaultIconUrl));
     }
 
-    // 然後在背景載入實際圖示，每個圖示獨立載入
-    const iconPromises = links.map((link, index) => 
+    const iconPromises = links.map((link, index) =>
         getFaviconUrl(link.url, link.iconUrl).then(iconUrl => {
-            let linkElement;
-            if (isMobile) {
-                // 手機版：需要跳過 Logo 佔位符（Logo 在第0個位置）
-                linkElement = customLinksContainer.children[index + 1]; // +1 因為有 Logo 佔位符
-            } else {
-                // 桌面版：需要跳過 Logo 佔位符
-                if (index < 4) {
-                    linkElement = customLinksContainer.children[index];
-                } else {
-                    linkElement = customLinksContainer.children[index + 1]; // +1 因為有 Logo 佔位符
-                }
-            }
+            const linkElement = customLinksContainer.children[index];
             const faviconElement = linkElement ? linkElement.querySelector('.nav-card__favicon') : null;
             if (faviconElement) {
                 faviconElement.src = iconUrl;
@@ -410,31 +449,12 @@ async function renderLinks() {
         })
     );
 
-    // 等待所有圖示載入完成
     await Promise.all(iconPromises);
 
     if (!editMode) {
-        // 在非編輯模式下，將 div 元素替換為 a 元素
         Array.from(customLinksContainer.children).forEach((div, index) => {
-            // 跳過 Logo 佔位符
-            if (div.classList.contains('logo-placeholder')) {
-                return;
-            }
-            
-            let linkIndex;
-            if (isMobile) {
-                // 手機版：需要跳過 Logo 佔位符（Logo 在第0個位置）
-                linkIndex = index - 1; // -1 因為跳過了 Logo 佔位符
-            } else {
-                // 桌面版：需要跳過 Logo 佔位符
-                if (index < 4) {
-                    linkIndex = index;
-                } else {
-                    linkIndex = index - 1; // -1 因為跳過了 Logo 佔位符
-                }
-            }
-            
-            const link = links[linkIndex];
+            const link = links[index];
+            if (!link) return;
             const anchorElement = document.createElement('a');
             anchorElement.href = link.url;
             anchorElement.className = div.className;
@@ -450,70 +470,26 @@ async function renderLinks() {
     if (editMode && sortableInstance) {
         sortableInstance.destroy();
     }
-    
-    if (editMode) {
-        // 為單一容器設置拖拽功能
+
+    if (editMode && window.Sortable) {
         sortableInstance = new Sortable(customLinksContainer, {
             animation: 150,
-            filter: '.logo-placeholder', // 排除 Logo 佔位符
-            onStart: function(evt) {
-                // 開始拖拽時添加 CSS 類別
+            onStart: function() {
                 customLinksContainer.classList.add('sortable-dragging');
             },
-            onMove: function(evt) {
-                // 拖拽過程中限制移動範圍，防止跨越 Logo
-                if (!isMobile) {
-                    const fromIndex = evt.oldIndex;
-                    const toIndex = evt.newIndex;
-                    
-                    // 如果從左邊拖到右邊，限制只能到第5個位置（Logo 後面）
-                    if (fromIndex < 4 && toIndex > 4) {
-                        return false; // 阻止移動
-                    }
-                    
-                    // 如果從右邊拖到左邊，限制只能到第4個位置（Logo 前面）
-                    if (fromIndex > 4 && toIndex < 4) {
-                        return false; // 阻止移動
-                    }
-                } else {
-                    // 手機版：防止拖拽到 Logo 位置（第0個位置）
-                    const toIndex = evt.newIndex;
-                    if (toIndex === 0) {
-                        return false; // 阻止移動到 Logo 位置
-                    }
-                }
-                return true;
-            },
             onEnd: function(evt) {
-                // 結束拖拽時移除 CSS 類別
                 customLinksContainer.classList.remove('sortable-dragging');
-                
                 const oldIndex = evt.oldIndex;
                 const newIndex = evt.newIndex;
                 if (oldIndex !== newIndex) {
-                    // 調整索引以跳過 Logo 佔位符
-                    let adjustedOldIndex = oldIndex;
-                    let adjustedNewIndex = newIndex;
-                    
-                    if (isMobile) {
-                        // 手機版：Logo 在第0個位置，所有連結索引都要 -1
-                        adjustedOldIndex = oldIndex - 1;
-                        adjustedNewIndex = newIndex - 1;
-                    } else {
-                        // 桌面版需要調整索引
-                        if (oldIndex > 4) adjustedOldIndex = oldIndex - 1;
-                        if (newIndex > 4) adjustedNewIndex = newIndex - 1;
-                    }
-                    
-                    const [movedItem] = links.splice(adjustedOldIndex, 1);
-                    links.splice(adjustedNewIndex, 0, movedItem);
+                    const [movedItem] = links.splice(oldIndex, 1);
+                    links.splice(newIndex, 0, movedItem);
                     saveSettings();
                 }
             }
         });
     }
 
-    // 在渲染連結後應用連結設置
     applyLinkSettings();
 }
 
@@ -530,12 +506,10 @@ function showEditModal(link, index) {
     iconUrlInput.value = link.iconUrl || '';
     editingIndex = index;
 
-    // 更新圖示預覽
     updateIconPreview();
 
     modal.classList.remove('hidden');
 
-    // 移除重複的 saveEdit 函數，使用 setupEditModal 中的版本
     cancelButton.onclick = () => {
         modal.classList.add('hidden');
     };
@@ -588,7 +562,6 @@ function closeSettingsPanel() {
     document.getElementById('settingsPanel').classList.add('hidden');
     renderLinks();
 
-    // 移除點擊事件監聽器
     document.removeEventListener('click', handleOutsideClick);
 }
 
@@ -599,8 +572,7 @@ function handleOutsideClick(event) {
     const confirmModal = document.getElementById('confirmModal');
     const customLinks = document.getElementById('custom-links');
 
-    // 檢查點擊是否在設定面板、設定按鈕、編輯模態框、確認模態框或自定義連結區域之外
-    if (!settingsPanel.contains(event.target) && 
+    if (!settingsPanel.contains(event.target) &&
         event.target !== settingsButton &&
         !settingsButton.contains(event.target) &&
         !editModal.contains(event.target) &&
@@ -659,7 +631,7 @@ function setupSearch() {
     const searchInput = document.getElementById('searchInput');
     const searchButton = document.getElementById('searchButton');
     const searchSuggest = document.getElementById('searchSuggest');
-    
+
     const searchFormMobile = document.getElementById('searchFormMobile');
     const searchInputMobile = document.getElementById('searchInputMobile');
     const searchButtonMobile = document.getElementById('searchButtonMobile');
@@ -691,13 +663,12 @@ function setupSearch() {
     }
 
     function performSearch() {
-        const query = (searchInput ? searchInput.value.trim() : '') || 
+        const query = (searchInput ? searchInput.value.trim() : '') ||
                      (searchInputMobile ? searchInputMobile.value.trim() : '');
         if (!query) return;
         runSearch(query);
     }
 
-    // 為桌機 / 行動版各自建立 autocomplete
     if (searchInput && searchSuggest) attachSuggest(searchInput, searchSuggest);
     if (searchInputMobile && searchSuggestMobile) attachSuggest(searchInputMobile, searchSuggestMobile);
 }
@@ -712,7 +683,7 @@ function runSearch(query) {
 }
 
 const SUGGEST_DEBOUNCE_MS = 180;
-const suggestCache = new Map(); // key = `${engine}|${q}`, value = string[]
+const suggestCache = new Map();
 
 function attachSuggest(inputEl, listEl) {
     let debounceTimer = null;
@@ -737,7 +708,7 @@ function attachSuggest(inputEl, listEl) {
         activeIdx = -1;
         const qLower = q.toLowerCase();
         listEl.innerHTML = list.map((s, i) => {
-            // 把命中文字（小寫比對）以 <mark> 包裝（淡色顯示已輸入部分）
+
             const html = highlightMatch(s, qLower);
             return `<button type="button" class="search-suggest__item" role="option" data-i="${i}">${html}</button>`;
         }).join('');
@@ -745,7 +716,7 @@ function attachSuggest(inputEl, listEl) {
 
         listEl.querySelectorAll('.search-suggest__item').forEach((btn, i) => {
             btn.addEventListener('mousedown', (e) => {
-                // mousedown 避免被 input blur 搶走 focus
+
                 e.preventDefault();
                 const value = items[i];
                 inputEl.value = value;
@@ -771,12 +742,11 @@ function attachSuggest(inputEl, listEl) {
         }
         const reqId = ++lastReqId;
         try {
-            const res = await fetch(`api_handler.php?action=suggest&engine=${encodeURIComponent(searchEngine)}&q=${encodeURIComponent(q)}`);
-            if (!res.ok) throw new Error('HTTP ' + res.status);
-            const data = await res.json();
-            const list = Array.isArray(data.suggestions) ? data.suggestions : [];
+            const data = await loadJsonp(`https://suggestqueries.google.com/complete/search?client=chrome&hl=zh-TW&q=${encodeURIComponent(q)}`);
+            const raw = Array.isArray(data) && Array.isArray(data[1]) ? data[1] : [];
+            const list = raw.filter(item => typeof item === 'string' && item !== '').slice(0, 8);
             suggestCache.set(key, list);
-            // 過時的請求結果丟棄
+
             if (reqId !== lastReqId) return null;
             return list;
         } catch (err) {
@@ -825,7 +795,7 @@ function attachSuggest(inputEl, listEl) {
     });
 
     inputEl.addEventListener('blur', () => {
-        // 給 click 一點時間先觸發
+
         setTimeout(close, 150);
     });
 
@@ -837,7 +807,7 @@ function attachSuggest(inputEl, listEl) {
 }
 
 function highlightMatch(text, qLower) {
-    // 將 text 中與 qLower 開頭相符的部分以原樣顯示，其餘以 <mark> 顯示為淡色
+
     const safe = String(text).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     if (!qLower) return safe;
     const idx = String(text).toLowerCase().indexOf(qLower);
@@ -845,13 +815,13 @@ function highlightMatch(text, qLower) {
     const safeBefore = String(text).slice(0, idx).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     const safeMatch  = String(text).slice(idx, idx + qLower.length).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     const safeAfter  = String(text).slice(idx + qLower.length).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-    // 已輸入部分用 mark 標示（淡色），剩餘為主色（建議新增內容）
+
     return `<mark>${safeBefore}${safeMatch}</mark>${safeAfter}`;
 }
 
 function applyLinkSettings() {
     document.querySelectorAll(
-        '#custom-links a:not(#logo-link), .cat-link, .feature-link, .dropdown__link, .footer-link'
+        '#custom-links a, .cat-link, .feature-link, .tool-block__link, .dropdown__link, .footer-link'
     ).forEach(link => {
         if (openInNewTab) {
             link.setAttribute('target', '_blank');
@@ -863,19 +833,9 @@ function applyLinkSettings() {
     });
 }
 
-async function fetchLunarDate(year, month, day) {
+function fetchLunarDate(year, month, day) {
     try {
-        const response = await fetch(`lunar.php?year=${year}&month=${month}&date=${day}`);
-        if (!response.ok) {
-            throw new Error('網路回應不正常');
-        }
-        const data = await response.json();
-        return {
-            month: data[1],
-            day: data[2],
-            yearName: data[3],
-            zodiac: data[6]
-        };
+        return solarToLunar(year, month, day);
     } catch (error) {
         console.error('取得農曆日期時發生錯誤:', error);
         return null;
@@ -886,7 +846,7 @@ function createCalendar() {
     const placeholder = document.getElementById('calendar-placeholder');
     let calendarContainer = document.getElementById('calendar-container');
     if (!calendarContainer) {
-        // 移除載入骨架後再建立真正的日曆
+
         const skeleton = placeholder ? placeholder.querySelector('.calendar--skeleton') : null;
         if (skeleton) skeleton.remove();
 
@@ -907,7 +867,6 @@ function createCalendar() {
                 <div>
                     <div class="calendar__date" id="currentDate"></div>
                     <div class="calendar__day" id="currentDay"></div>
-                    <div class="calendar__holiday" id="holidayInfo"></div>
                 </div>
                 <div>
                     <div class="calendar__nav">
@@ -944,33 +903,29 @@ function createCalendar() {
     updateCalendar();
 }
 
-// 設定月份導航功能
 function setupMonthNavigation() {
     const prevBtn = document.getElementById('prevMonthBtn');
     const nextBtn = document.getElementById('nextMonthBtn');
-    
+
     if (prevBtn && nextBtn) {
         prevBtn.addEventListener('click', () => {
             changeMonth(-1);
         });
-        
+
         nextBtn.addEventListener('click', () => {
             changeMonth(1);
         });
     }
 }
 
-// 切換月份
 function changeMonth(direction) {
     const now = new Date();
     const currentMonth = now.getMonth();
     const currentYear = now.getFullYear();
-    
-    // 計算新的月份和年份
+
     let newMonth = displayedMonth + direction;
     let newYear = displayedYear;
-    
-    // 處理年份跨越
+
     if (newMonth < 0) {
         newMonth = 11;
         newYear--;
@@ -978,22 +933,14 @@ function changeMonth(direction) {
         newMonth = 0;
         newYear++;
     }
-    
-    // 限制在前後三個月範圍內
+
     const currentTotalMonths = currentYear * 12 + currentMonth;
     const newTotalMonths = newYear * 12 + newMonth;
     const monthDifference = Math.abs(newTotalMonths - currentTotalMonths);
-    
-    // 允許前後三個月的範圍（包含跨年）
+
     if (monthDifference <= 3) {
         displayedMonth = newMonth;
         displayedYear = newYear;
-        
-        // 檢查是否需要更新節日資料
-        if (displayedYear !== currentYear) {
-            holidays = getHolidays(displayedYear);
-        }
-        
         updateCalendar();
     } else {
         console.log('超出範圍限制:', {
@@ -1004,26 +951,23 @@ function changeMonth(direction) {
     }
 }
 
-
-// 更新導航按鈕狀態
 function updateNavigationButtons() {
     const now = new Date();
     const currentMonth = now.getMonth();
     const currentYear = now.getFullYear();
-    
+
     const prevBtn = document.getElementById('prevMonthBtn');
     const nextBtn = document.getElementById('nextMonthBtn');
-    
+
     if (prevBtn && nextBtn) {
-        // 計算當前月份與顯示月份的差距
+
         const currentTotalMonths = currentYear * 12 + currentMonth;
         const displayedTotalMonths = displayedYear * 12 + displayedMonth;
         const monthDifference = Math.abs(displayedTotalMonths - currentTotalMonths);
-        
-        // 更新按鈕狀態 - 檢查是否可以繼續向前或向後
+
         const canGoPrev = displayedTotalMonths > currentTotalMonths - 3;
         const canGoNext = displayedTotalMonths < currentTotalMonths + 3;
-        
+
         prevBtn.disabled = !canGoPrev;
         nextBtn.disabled = !canGoNext;
     }
@@ -1032,11 +976,10 @@ function updateNavigationButtons() {
 function createDayElement(day, month, year, isCurrentMonth) {
     const dayElement = document.createElement('div');
     dayElement.textContent = day;
-    
-    // 處理跨年的月份計算
+
     let actualMonth = month;
     let actualYear = year;
-    
+
     if (month < 0) {
         actualMonth = 11;
         actualYear = year - 1;
@@ -1044,24 +987,16 @@ function createDayElement(day, month, year, isCurrentMonth) {
         actualMonth = 0;
         actualYear = year + 1;
     }
-    
+
     const date = new Date(actualYear, actualMonth, day);
     const dayOfWeek = date.getDay();
-    const dateString = `${actualMonth + 1}-${day}`;
-    const holidayInfo = holidays[dateString];
     const isToday = (new Date().toDateString() === date.toDateString());
 
     dayElement.className = 'calendar__cell calendar__cell--day';
 
     if (isCurrentMonth) {
         if (isToday) {
-            dayElement.classList.add(holidayInfo && holidayInfo.isHoliday
-                ? 'calendar__cell--today-holiday'
-                : 'calendar__cell--today');
-        } else if (holidayInfo) {
-            dayElement.classList.add(holidayInfo.isHoliday
-                ? 'calendar__cell--holiday'
-                : 'calendar__cell--workday');
+            dayElement.classList.add('calendar__cell--today');
         } else if (dayOfWeek === 0) {
             dayElement.classList.add('calendar__cell--sun');
         } else if (dayOfWeek === 6) {
@@ -1070,17 +1005,10 @@ function createDayElement(day, month, year, isCurrentMonth) {
     } else {
         dayElement.classList.add('calendar__cell--out');
     }
-    
-    if (holidayInfo) {
-        dayElement.setAttribute('data-holiday', holidayInfo.name);
-        dayElement.setAttribute('data-is-holiday', holidayInfo.isHoliday);
-        dayElement.addEventListener('mouseenter', showHolidayTooltip);
-        dayElement.addEventListener('mouseleave', hideHolidayTooltip);
-    }
-    
+
     dayElement.setAttribute('data-date', `${actualYear}-${actualMonth + 1}-${day}`);
     dayElement.addEventListener('click', handleDayClick);
-    
+
     return dayElement;
 }
 
@@ -1091,17 +1019,6 @@ async function handleDayClick(event) {
 
     document.getElementById('currentDate').textContent = `${month}.${day}`;
     document.getElementById('currentDay').textContent = currentDay;
-
-    const dateString = `${month}-${day}`;
-    const holidayInfo = holidays[dateString];
-    const holidayInfoElement = document.getElementById('holidayInfo');
-    if (holidayInfo) {
-        holidayInfoElement.textContent = holidayInfo.name;
-        holidayInfoElement.className = 'calendar__holiday' + (holidayInfo.isHoliday ? '' : ' calendar__holiday--normal');
-    } else {
-        holidayInfoElement.textContent = '';
-        holidayInfoElement.className = 'hidden';
-    }
 
     const lunarDate = await fetchLunarDate(year, month, day);
     if (lunarDate) {
@@ -1117,44 +1034,12 @@ async function handleDayClick(event) {
 
         dayEl.classList.remove('calendar__cell--selected');
         if (!isToday) {
-            dayEl.classList.remove('calendar__cell--today', 'calendar__cell--today-holiday');
+            dayEl.classList.remove('calendar__cell--today');
         }
     });
 
     if (clickedDate.toDateString() !== today) {
         event.target.classList.add('calendar__cell--selected');
-    }
-}
-
-function showHolidayTooltip(event) {
-    const holidayName = event.target.getAttribute('data-holiday');
-    let tooltip = event.target.querySelector('.holiday-tooltip');
-    
-    if (tooltip) {
-        tooltip.style.display = 'block';
-        return;
-    }
-    
-    tooltip = document.createElement('div');
-    tooltip.className = 'holiday-tooltip tooltip';
-    tooltip.textContent = holidayName;
-
-    const rect = event.target.getBoundingClientRect();
-    const tooltipWidth = 200; // 估計的最大寬度
-    const viewportWidth = window.innerWidth;
-    if (rect.left + tooltipWidth / 2 > viewportWidth) {
-        tooltip.style.left = 'auto';
-        tooltip.style.right = '0';
-        tooltip.style.transform = 'translateX(0)';
-    }
-    
-    event.target.appendChild(tooltip);
-}
-
-function hideHolidayTooltip(event) {
-    const tooltip = event.target.querySelector('.holiday-tooltip');
-    if (tooltip) {
-        tooltip.style.display = 'none';
     }
 }
 
@@ -1165,42 +1050,26 @@ async function updateCalendar() {
     const todayYear = now.getFullYear();
     const todayDay = ['日', '一', '二', '三', '四', '五', '六'][now.getDay()];
 
-    // 更新按鈕狀態
     updateNavigationButtons();
 
-    // 左側基本資訊（純運算，立即顯示）；農曆需查詢的日期先記下來，最後再非同步補上
     let lunarYear, lunarMonth, lunarDay;
     if (displayedMonth === todayMonth && displayedYear === todayYear) {
         document.getElementById('currentDate').textContent = `${todayMonth + 1}.${todayDate}`;
         document.getElementById('currentDay').textContent = todayDay;
 
-        const dateString = `${todayMonth + 1}-${todayDate}`;
-        const holidayInfo = holidays[dateString];
-        const holidayInfoElement = document.getElementById('holidayInfo');
-        if (holidayInfo) {
-            holidayInfoElement.textContent = holidayInfo.name;
-            holidayInfoElement.className = 'calendar__holiday' + (holidayInfo.isHoliday ? '' : ' calendar__holiday--normal');
-        } else {
-            holidayInfoElement.textContent = '';
-            holidayInfoElement.className = 'hidden';
-        }
-
         lunarYear = todayYear;
         lunarMonth = todayMonth + 1;
         lunarDay = todayDate;
     } else {
-        // 如果不是當月，顯示該月第一天或清空資訊
+
         document.getElementById('currentDate').textContent = `${displayedMonth + 1}.1`;
         document.getElementById('currentDay').textContent = ['日', '一', '二', '三', '四', '五', '六'][new Date(displayedYear, displayedMonth, 1).getDay()];
-        document.getElementById('holidayInfo').textContent = '';
-        document.getElementById('holidayInfo').className = 'hidden';
 
         lunarYear = displayedYear;
         lunarMonth = displayedMonth + 1;
         lunarDay = 1;
     }
 
-    // 右側日期格只靠日期運算，先立即渲染，不等農曆網路請求
     const daysInMonth = new Date(displayedYear, displayedMonth + 1, 0).getDate();
     const firstDayOfMonth = new Date(displayedYear, displayedMonth, 1).getDay();
     const daysInPrevMonth = new Date(displayedYear, displayedMonth, 0).getDate();
@@ -1208,51 +1077,47 @@ async function updateCalendar() {
     const calendarDays = document.getElementById('calendarDays');
     calendarDays.innerHTML = '';
 
-    // 計算需要顯示的總天數，確保總是6行（42天）
-    const totalCells = 42; // 6行 × 7天 = 42個格子
+    const totalCells = 42;
     const currentMonthStartIndex = firstDayOfMonth;
     const currentMonthEndIndex = firstDayOfMonth + daysInMonth - 1;
 
     for (let i = 0; i < totalCells; i++) {
         let day, month, year, isCurrentMonth;
-        
+
         if (i < currentMonthStartIndex) {
-            // 上個月的日期
+
             day = daysInPrevMonth - (currentMonthStartIndex - 1 - i);
             month = displayedMonth - 1;
             year = displayedYear;
             isCurrentMonth = false;
-            
-            // 處理跨年情況
+
             if (month < 0) {
                 month = 11;
                 year = displayedYear - 1;
             }
         } else if (i <= currentMonthEndIndex) {
-            // 當月的日期
+
             day = i - currentMonthStartIndex + 1;
             month = displayedMonth;
             year = displayedYear;
             isCurrentMonth = true;
         } else {
-            // 下個月的日期
+
             day = i - currentMonthEndIndex;
             month = displayedMonth + 1;
             year = displayedYear;
             isCurrentMonth = false;
-            
-            // 處理跨年情況
+
             if (month > 11) {
                 month = 0;
                 year = displayedYear + 1;
             }
         }
-        
+
         const dayElement = createDayElement(day, month, year, isCurrentMonth);
         calendarDays.appendChild(dayElement);
     }
 
-    // 農曆資料最後再非同步補上，不阻塞左側基本資訊與右側日期格的顯示
     const lunarDate = await fetchLunarDate(lunarYear, lunarMonth, lunarDay);
     if (lunarDate) {
         document.getElementById('lunarDate').innerHTML = `${lunarDate.month}${lunarDate.day}<br>${lunarDate.yearName}年 (${lunarDate.zodiac})`;
@@ -1260,8 +1125,8 @@ async function updateCalendar() {
 }
 
 async function initializeApp() {
-    holidays = getHolidays(currentYear);
     loadSettings();
+    renderDirectory();
     setupSearch();
     renderLinks();
     applyLinkSettings();
@@ -1284,16 +1149,14 @@ async function initializeApp() {
     });
 }
 
-
-// 更新圖示預覽
 function updateIconPreview() {
     const iconPreview = document.getElementById('iconPreview');
     const editIconUrlInput = document.getElementById('editIconUrl');
-    
+
     if (!iconPreview || !editIconUrlInput) return;
-    
+
     const iconUrl = editIconUrlInput.value.trim();
-    
+
     if (!iconUrl) {
         iconPreview.innerHTML = '<span class="text-xs text-muted">預覽</span>';
         return;
@@ -1314,7 +1177,6 @@ function updateIconPreview() {
     img.src = processedUrl;
 }
 
-// 設定編輯模態框
 function setupEditModal() {
     const editNameInput = document.getElementById('editName');
     const editUrlInput = document.getElementById('editUrl');
@@ -1329,26 +1191,25 @@ function setupEditModal() {
     editIconUrlInput.parentNode.insertBefore(iconUrlErrorMessage, editIconUrlInput.nextSibling);
 
     function validateUrl(url) {
-        // 允許 http://, https://, ftp://, file://, 或無協議的 URL，包括國際化域名
+
         const urlPattern = /^(https?:\/\/|ftp:\/\/|file:\/\/|\/\/)?(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.?[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&//=]*[^\s])$/u;
-        
+
         let processedUrl = url.trim();
-        
-        // 如果 URL 沒有協議，預設添加 https://
+
         if (!processedUrl.match(/^[a-zA-Z]+:\/\//)) {
             processedUrl = 'https://' + processedUrl;
         }
-        
+
         let isValid = false;
         try {
-            // 嘗試創建 URL 物件來驗證
+
             new URL(processedUrl);
             isValid = true;
         } catch (e) {
-            // 如果創建 URL 物件失敗，使用正則表達式次檢查
+
             isValid = urlPattern.test(processedUrl);
         }
-        
+
         urlErrorMessage.textContent = isValid ? '' : '請輸入有效的網址';
         urlErrorMessage.classList.toggle('hidden', isValid);
         return { isValid, processedUrl };
@@ -1360,31 +1221,29 @@ function setupEditModal() {
             iconUrlErrorMessage.classList.add('hidden');
             return { isValid: true, processedUrl: '' };
         }
-        
+
         const urlPattern = /^(https?:\/\/|ftp:\/\/|file:\/\/|\/\/)?(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.?[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&//=]*[^\s])$/u;
-        
+
         let processedUrl = iconUrl.trim();
-        
-        // 如果 URL 沒有協議，預設添加 https://
+
         if (!processedUrl.match(/^[a-zA-Z]+:\/\//)) {
             processedUrl = 'https://' + processedUrl;
         }
-        
+
         let isValid = false;
         try {
-            // 嘗試創建 URL 物件來驗證
+
             new URL(processedUrl);
             isValid = true;
         } catch (e) {
-            // 如果創建 URL 物件失敗，使用正則表達式次檢查
+
             isValid = urlPattern.test(processedUrl);
         }
-        
+
         iconUrlErrorMessage.textContent = isValid ? '' : '請輸入有效的圖示網址';
         iconUrlErrorMessage.classList.toggle('hidden', isValid);
         return { isValid, processedUrl };
     }
-
 
     function saveEdit() {
         const name = editNameInput.value;
@@ -1392,10 +1251,10 @@ function setupEditModal() {
         const iconUrl = editIconUrlInput.value;
         const { isValid: urlValid, processedUrl } = validateUrl(url);
         const { isValid: iconUrlValid, processedUrl: processedIconUrl } = validateIconUrl(iconUrl);
-        
+
         if (editingIndex !== -1 && urlValid && iconUrlValid) {
-            links[editingIndex] = { 
-                name, 
+            links[editingIndex] = {
+                name,
                 url: processedUrl,
                 iconUrl: processedIconUrl || undefined
             };
@@ -1423,7 +1282,6 @@ function setupEditModal() {
 
 document.addEventListener('DOMContentLoaded', async () => {
     try {
-        await loadModules;
         await initializeApp();
     } catch (error) {
         console.error('載入時發生錯誤:', error);
