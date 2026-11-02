@@ -2,6 +2,8 @@
 
 用瀏覽器打開 `index.html` 就能用。站名和連結都在 `config.js`。
 
+示範頁：<https://vegbao.github.io/portal/>
+
 要放到網路上，把整個資料夾放到任何靜態空間即可。
 
 ## 改成你的站
