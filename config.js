@@ -15,7 +15,7 @@ window.portalConfig = {
     },
     "nav_links": [
         {
-            "name": "Email",
+            "name": "Gmail",
             "url": "https://mail.google.com"
         },
         {
