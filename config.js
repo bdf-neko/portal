@@ -226,6 +226,10 @@ window.portalConfig = {
                 [
                     "Mobile01",
                     "https://www.mobile01.com/"
+                ],
+                [
+                    "GitHub",
+                    "https://github.com/"
                 ]
             ]
         ]
@@ -370,7 +374,7 @@ window.portalConfig = {
                     "https://www.amazon.com"
                 ],
                 [
-                    "Amazon 日本",
+                    "Amazon.jp",
                     "https://www.amazon.co.jp"
                 ],
                 [
