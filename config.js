@@ -205,27 +205,27 @@ window.portalConfig = {
             ]
         ],
         [
-            "音樂",
+            "興趣",
             [
                 [
-                    "Spotify",
-                    "https://www.spotify.com"
-                ],
-                [
-                    "KKBOX",
-                    "https://www.kkbox.com"
-                ],
-                [
-                    "Apple",
-                    "https://music.apple.com"
-                ],
-                [
-                    "Youtube",
+                    "YTM",
                     "https://music.youtube.com"
                 ],
                 [
-                    "街聲",
-                    "https://streetvoice.com"
+                    "Steam",
+                    "https://store.steampowered.com"
+                ],
+                [
+                    "香水1976",
+                    "https://www.1976.com.tw/index"
+                ],
+                [
+                    "Garmin Connect",
+                    "https://connect.garmin.com/zh_TW/"
+                ],
+                [
+                    "Mobile01",
+                    "https://www.mobile01.com/"
                 ]
             ]
         ]
