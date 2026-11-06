@@ -1,6 +1,6 @@
 window.portalConfig = {
-    "site_name": "我的入口",
-    "tagline": "自己的網路起點",
+    "site_name": "My Portal",
+    "tagline": "出發",
     "description": "一個可以自己架設的入口網站。",
     "theme_color": "#3b82f6",
     "feature_links": {
