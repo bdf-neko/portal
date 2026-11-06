@@ -130,7 +130,7 @@ window.portalConfig = {
                     "https://www.disneyplus.com"
                 ],
                 [
-                    "max",
+                    "HBO max",
                     "https://www.max.com/tw/zh"
                 ],
                 [
