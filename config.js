@@ -19,6 +19,10 @@ window.portalConfig = {
             "url": "https://mail.google.com"
         },
         {
+            "name": "Maps",
+            "url": "https://www.google.com/maps"
+        },
+        {
             "name": "YouTube",
             "url": "https://youtube.com"
         },
@@ -47,12 +51,8 @@ window.portalConfig = {
             "url": "https://gemini.google.com"
         },
         {
-            "name": "MEGA",
-            "url": "https://mega.nz"
-        },
-        {
-            "name": "GitHub",
-            "url": "https://github.com"
+            "name": "氣象",
+            "url": "https://www.cwa.gov.tw"
         }
     ],
     "categories_primary": [
