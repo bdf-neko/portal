@@ -15,6 +15,10 @@ window.portalConfig = {
     },
     "nav_links": [
         {
+            "name": "Google",
+            "url": "https://www.google.com.tw/"
+        },
+        {
             "name": "Gmail",
             "url": "https://mail.google.com"
         },
@@ -49,10 +53,6 @@ window.portalConfig = {
         {
             "name": "Gemini",
             "url": "https://gemini.google.com"
-        },
-        {
-            "name": "氣象",
-            "url": "https://www.cwa.gov.tw"
         }
     ],
     "categories_primary": [
