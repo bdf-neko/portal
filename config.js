@@ -19,8 +19,8 @@ window.portalConfig = {
             "url": "https://mail.google.com"
         },
         {
-            "name": "Mosir",
-            "url": "https://beta.mosir.app/"
+            "name": "YouTube",
+            "url": "https://youtube.com"
         },
         {
             "name": "Facebook",
@@ -31,28 +31,28 @@ window.portalConfig = {
             "url": "https://instagram.com"
         },
         {
-            "name": "X",
-            "url": "https://x.com"
-        },
-        {
             "name": "Threads",
             "url": "https://threads.net"
         },
         {
-            "name": "Bluesky",
-            "url": "https://bsky.app"
+            "name": "Claude",
+            "url": "https://claude.ai"
         },
         {
-            "name": "YouTube",
-            "url": "https://youtube.com"
+            "name": "ChatGPT",
+            "url": "https://chatgpt.com"
         },
         {
-            "name": "Twitch",
-            "url": "https://twitch.tv"
+            "name": "Gemini",
+            "url": "https://gemini.google.com"
         },
         {
-            "name": "Discord",
-            "url": "https://discord.com"
+            "name": "MEGA",
+            "url": "https://mega.nz"
+        },
+        {
+            "name": "GitHub",
+            "url": "https://github.com"
         }
     ],
     "categories_primary": [
