@@ -1,6 +1,6 @@
 window.portalConfig = {
     "site_name": "My Portal",
-    "tagline": "我的入口網站",
+    "tagline": "入口",
     "description": "一個可以自己架設的入口網站。",
     "theme_color": "#3b82f6",
     "feature_links": {
