@@ -138,20 +138,20 @@ window.portalConfig = {
                     "https://www.disneyplus.com"
                 ],
                 [
-                    "HBO max",
-                    "https://www.max.com/tw/zh"
+                    "公視+",
+                    "https://www.ptsplus.tv"
                 ],
                 [
-                    "LINE",
-                    "https://linetv.tw"
-                ],
-                [
-                    "friDay",
-                    "https://video.friday.tw"
+                    "動畫瘋",
+                    "https://ani.gamer.com.tw"
                 ],
                 [
                     "Hami",
                     "https://hamivideo.hinet.net/"
+                ],
+                [
+                    "friDay",
+                    "https://video.friday.tw"
                 ],
                 [
                     "MyVideo",
@@ -160,43 +160,31 @@ window.portalConfig = {
                 [
                     "愛爾達",
                     "https://www.elta.tv"
-                ],
-                [
-                    "公視+",
-                    "https://www.ptsplus.tv"
-                ],
-                [
-                    "動畫瘋",
-                    "https://ani.gamer.com.tw"
                 ]
             ]
         ],
         [
-            "遊戲",
+            "棒球",
             [
                 [
-                    "巴哈",
-                    "https://www.gamer.com.tw"
+                    "MLB",
+                    "https://www.mlb.com/"
                 ],
                 [
-                    "Steam",
-                    "https://store.steampowered.com"
+                    "CPBL",
+                    "https://www.cpbl.com.tw/"
                 ],
                 [
-                    "Epic",
-                    "https://www.epicgames.com/store"
+                    "富邦悍將",
+                    "https://www.fubonguardians.com/content/masterpage/Index"
                 ],
                 [
-                    "Origin",
-                    "https://www.origin.com"
+                    "統一獅",
+                    "https://www.uni-lions.com.tw/"
                 ],
                 [
-                    "GOG",
-                    "https://www.gog.com"
-                ],
-                [
-                    "QooApp",
-                    "https://www.qoo-app.com"
+                    "台鋼雄鷹",
+                    "https://www.tsghawks.com/"
                 ]
             ]
         ],
