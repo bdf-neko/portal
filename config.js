@@ -592,10 +592,6 @@ window.portalConfig = {
                     "https://www.icloud.com"
                 ],
                 [
-                    "OneDrive",
-                    "https://onedrive.live.com"
-                ],
-                [
                     "MEGA",
                     "https://mega.nz"
                 ]
