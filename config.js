@@ -295,10 +295,7 @@ window.portalConfig = {
             "購物",
             "var(--color-3)",
             [
-                [
-                    "酷澎",
-                    "https://www.tw.coupang.com"
-                ],
+
                 [
                     "PChome",
                     "https://24h.pchome.com.tw"
@@ -308,40 +305,20 @@ window.portalConfig = {
                     "https://www.momoshop.com.tw"
                 ],
                 [
-                    "Yahoo! 購物",
-                    "https://tw.buy.yahoo.com"
-                ],
-                [
-                    "樂天",
-                    "https://www.rakuten.com.tw"
-                ],
-                [
-                    "東森",
-                    "https://www.etmall.com.tw"
-                ],
-                [
-                    "friDay",
-                    "https://shopping.friday.tw"
-                ],
-                [
-                    "Pinkoi",
-                    "https://www.pinkoi.com"
-                ],
-                [
-                    "買動漫",
-                    "https://www.myacg.com.tw"
-                ],
+                    "酷澎",
+                    "https://www.tw.coupang.com"
+                ],                
                 [
                     "蝦皮",
                     "https://shopee.tw"
                 ],
                 [
-                    "露天",
-                    "https://www.ruten.com.tw"
+                    "Yahoo! 購物",
+                    "https://tw.buy.yahoo.com"
                 ],
                 [
-                    "Yahoo! 拍賣",
-                    "https://tw.bid.yahoo.com"
+                    "露天",
+                    "https://www.ruten.com.tw"
                 ],
                 [
                     "旋轉",
@@ -353,10 +330,6 @@ window.portalConfig = {
             "海外",
             "var(--color-4)",
             [
-                [
-                    "Amazon 美國",
-                    "https://www.amazon.com"
-                ],
                 [
                     "Amazon.jp",
                     "https://www.amazon.co.jp"
