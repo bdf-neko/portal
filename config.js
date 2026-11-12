@@ -105,7 +105,7 @@ window.portalConfig = {
                     "https://www.msn.com/zh-tw"
                 ],
                 [
-                    "自由",
+                    "自由時報",
                     "https://www.ltn.com.tw/"
                 ],
                 [
