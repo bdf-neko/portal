@@ -400,44 +400,28 @@ window.portalConfig = {
             "var(--color-5)",
             [
                 [
-                    "博客來",
-                    "https://www.books.com.tw"
+                    "moom",
+                    "https://moom.com.tw/tw"
                 ],
                 [
-                    "金石堂",
-                    "https://www.kingstone.com.tw"
+                    "博客來",
+                    "https://www.books.com.tw"
                 ],
                 [
                     "誠品",
                     "https://www.eslite.com"
                 ],
                 [
-                    "三民",
-                    "https://www.sanmin.com.tw"
-                ],
-                [
-                    "讀冊",
-                    "https://www.taaze.tw"
-                ],
-                [
-                    "天瓏",
-                    "https://www.tenlong.com.tw"
+                    "金石堂",
+                    "https://www.kingstone.com.tw"
                 ],
                 [
                     "讀墨",
                     "https://readmoo.com"
                 ],
                 [
-                    "Kobo",
-                    "https://www.kobo.com"
-                ],
-                [
-                    "漫讀",
-                    "https://www.bookwalker.com.tw"
-                ],
-                [
-                    "嗨讀",
-                    "https://ebook.hyread.com.tw"
+                    "讀冊",
+                    "https://www.taaze.tw"
                 ],
                 [
                     "書寶",
@@ -446,14 +430,6 @@ window.portalConfig = {
                 [
                     "台灣雲端",
                     "https://www.ebookservice.tw"
-                ],
-                [
-                    "一證通",
-                    "https://allpass.nlpi.edu.tw"
-                ],
-                [
-                    "臺灣商務",
-                    "https://www.cptw.com.tw"
                 ]
             ]
         ],
