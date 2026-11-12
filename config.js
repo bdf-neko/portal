@@ -101,7 +101,7 @@ window.portalConfig = {
                     "https://news.pts.org.tw/"
                 ],
                 [
-                    "msn",
+                    "MSN",
                     "https://www.msn.com/zh-tw"
                 ],
                 [
@@ -123,14 +123,6 @@ window.portalConfig = {
                 [
                     "BBC中文",
                     "https://www.bbc.com/zhongwen/trad"
-                ],
-                [
-                    "地球圖輯",
-                    "https://dq.yam.com/"
-                ],
-                [
-                    "轉角國際",
-                    "https://global.udn.com/"
                 ]
             ]
         ],
