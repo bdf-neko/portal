@@ -146,10 +146,6 @@ window.portalConfig = {
                     "https://hamivideo.hinet.net/"
                 ],
                 [
-                    "CATCHPLAY+",
-                    "https://www.catchplay.com/tw/home"
-                ],
-                [
                     "MyVideo",
                     "https://www.myvideo.net.tw/"
                 ],
@@ -164,14 +160,6 @@ window.portalConfig = {
                 [
                     "動畫瘋",
                     "https://ani.gamer.com.tw"
-                ],
-                [
-                    "Giloo",
-                    "https://giloo.ist"
-                ],
-                [
-                    "GagaOOLala",
-                    "https://www.gagaoolala.com"
                 ]
             ]
         ],
