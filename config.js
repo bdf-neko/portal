@@ -101,12 +101,28 @@ window.portalConfig = {
                     "https://news.pts.org.tw/"
                 ],
                 [
-                    "華視",
-                    "https://news.cts.com.tw/"
+                    "msn",
+                    "https://www.msn.com/zh-tw"
+                ],
+                [
+                    "自由",
+                    "https://www.ltn.com.tw/"
+                ],
+                [
+                    "自由體育",
+                    "https://sports.ltn.com.tw/"
                 ],
                 [
                     "報導者",
                     "https://www.twreporter.org/"
+                ],
+                [
+                    "華視",
+                    "https://news.cts.com.tw/"
+                ],
+                [
+                    "BBC中文",
+                    "https://www.bbc.com/zhongwen/trad"
                 ],
                 [
                     "地球圖輯",
