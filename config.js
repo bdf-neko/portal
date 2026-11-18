@@ -212,6 +212,10 @@ window.portalConfig = {
                     "https://www.mobile01.com/"
                 ],
                 [
+                    "遠傳電信",
+                    "https://www.fetnet.net/content/cbu/tw/index.html"
+                ],
+                [
                     "GitHub",
                     "https://github.com/"
                 ]
